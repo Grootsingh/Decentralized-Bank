@@ -7,7 +7,7 @@ const config: HardhatUserConfig = {
   solidity: "0.8.24",
   networks: {
     fuji: {
-      url: process.env.INFURA_AVALANCHE_ENDPOINT,
+      url: process.env.SEPOLIA_ENDPOINT,
       accounts: [process.env.PRIVATE_KEY as string],
     },
   },

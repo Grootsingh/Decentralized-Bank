@@ -1,5 +1,5 @@
 "use client";
-import { avalancheFuji } from "wagmi/chains";
+import { sepolia } from "wagmi/chains";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import React from "react";
 import { ConnectionState } from "@/RecoilState";
@@ -49,7 +49,7 @@ function AccountInfo() {
             <button
               key={connector.uid}
               onClick={() => {
-                connect({ connector, chainId: avalancheFuji.id });
+                connect({ connector, chainId: sepolia.id });
               }}
               type="button"
               className="rounded-md bg-blue-500 font-semibold text-white mr-2 px-2 py-1"

@@ -1,17 +1,17 @@
 import { http, createConfig, cookieStorage, createStorage } from "wagmi";
-import { avalancheFuji, hardhat } from "wagmi/chains";
+import { sepolia, hardhat } from "wagmi/chains";
 import { injected } from "wagmi/connectors";
 require("dotenv").config();
 
 export const config = createConfig({
-  chains: [avalancheFuji],
+  chains: [sepolia],
   connectors: [injected()],
   ssr: true,
   storage: createStorage({
     storage: cookieStorage,
   }),
   transports: {
-    [avalancheFuji.id]: http(process.env.INFURA_AVALANCHE_ENDPOINT),
+    [sepolia.id]: http(process.env.SEPOLIA_ENDPOINT),
   },
 });
 
