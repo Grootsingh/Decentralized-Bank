@@ -1,7 +1,7 @@
 "use client";
 import { useAccount, useConnect, useWriteContract } from "wagmi";
 import { injected } from "wagmi/connectors";
-import { avalancheFuji } from "wagmi/chains";
+import { sepolia } from "wagmi/chains";
 import abi from "../ABI";
 import { contractAddress } from "./Constant";
 import { useSetRecoilState } from "recoil";
@@ -53,7 +53,7 @@ function useWriteToContractFn() {
     if (!account.address) {
       await connectAsync({
         connector: injected(),
-        chainId: avalancheFuji.id,
+        chainId: sepolia.id,
       }).catch((errorMessage: ConnectErrorType) => {
         // @ts-ignore
         setConnectionState(errorMessage?.cause?.message);
@@ -91,7 +91,7 @@ function useReadToContractFn() {
     if (!account.address) {
       await connectAsync({
         connector: injected(),
-        chainId: avalancheFuji.id,
+        chainId: sepolia.id,
       }).catch((errorMessage: ConnectErrorType) =>
         //@ts-ignore
         setConnectionState(errorMessage.cause.message)
