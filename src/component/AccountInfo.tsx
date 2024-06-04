@@ -6,24 +6,19 @@ import { ConnectionState } from "@/RecoilState";
 import { useRecoilState } from "recoil";
 function AccountInfo() {
   const account = useAccount();
-  const { connectors, connect, error: connectionError } = useConnect();
+  const { connectors, connect, error: connectionError, isError } = useConnect();
   const { disconnect } = useDisconnect();
   const [connectState, setConnectionState] = useRecoilState(ConnectionState);
 
   React.useEffect(() => {
-    //@ts-ignore
-    setConnectionState(connectionError?.cause?.message);
-
-    //@ts-ignore
-  }, [connectionError?.cause?.message]);
-
-  React.useEffect(() => {
-    if (connectState !== "none") {
+    if (isError) {
+      //@ts-ignore
+      setConnectionState(connectionError?.cause?.message);
       setTimeout(() => {
         setConnectionState("none");
       }, 10 * 1000);
     }
-  }, [connectState]);
+  }, [isError]);
 
   return (
     <>
