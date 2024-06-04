@@ -7,7 +7,7 @@ import { watchContractEvent } from "wagmi/actions";
 import { config } from "@/wagmi";
 import { contractAddress } from "@/Constant";
 import abi from "../../../ABI";
-import { formatUnits, isAddress } from "viem";
+import { formatUnits } from "viem";
 
 interface DepositEmitType {
   approvedBy: `0x${string}`[];
@@ -34,6 +34,10 @@ function ApproveWithdrawal() {
   const [approveEmit, setApproveEmit] = React.useState<DepositEmitType>();
   const globalWriteRequestState = useRecoilValue(GlobalWriteRequestState);
   const unwatchRef = React.useRef<() => void>();
+  const [emitState, setEmitState] = React.useState<
+    "idle" | "loading" | "success"
+  >("idle");
+  const [isClicked, setClicked] = React.useState<"approveWithdrawal" | "">("");
   function handleApprovealRequest() {
     if (!accountID) {
       return setError("accountID required");
@@ -49,7 +53,7 @@ function ApproveWithdrawal() {
     }
     const accountIDNumber = Number(accountID);
     const withdrawIDNumber = Number(withdrawID);
-
+    setClicked("approveWithdrawal");
     setError("");
     writeToContractFn(
       "approveWithdrawal",
@@ -60,7 +64,12 @@ function ApproveWithdrawal() {
   }
 
   React.useEffect(() => {
-    if (globalWriteRequestState === "success") {
+    if (
+      globalWriteRequestState === "success" &&
+      isClicked === "approveWithdrawal"
+    ) {
+      setEmitState("loading");
+      setClicked("");
       setAccountID("");
       setWithdrawID("");
 
@@ -105,6 +114,8 @@ function ApproveWithdrawal() {
   React.useEffect(() => {
     if (typeof unwatchRef.current === "function") {
       unwatchRef?.current();
+      setEmitState("success");
+      setClicked("");
     }
   }, [approveEmit?.timestamp]);
 
@@ -170,13 +181,20 @@ function ApproveWithdrawal() {
             </div>
           </div>
 
-          {approveEmit ? (
+          {emitState === "success" ? (
             <div className="rounded-md flex bg-green-400 px-2 py-1 w-fit mt-1">
               <p className="text-xs font-bold pr-1 text-nowrap text-gray-950">
                 Emit -
               </p>
               <p className="text-xs font-bold text-gray-950">
                 {JSON.stringify(approveEmit, null, 2)}
+              </p>
+            </div>
+          ) : undefined}
+          {emitState === "loading" ? (
+            <div className="rounded-md flex bg-green-400 px-2 py-1 w-fit mt-1">
+              <p className="text-xs font-bold pr-1 text-nowrap text-gray-950">
+                Loading...
               </p>
             </div>
           ) : undefined}

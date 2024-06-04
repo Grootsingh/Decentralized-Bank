@@ -10,7 +10,7 @@ import WithdrawMulti from "./WithdrawMulti";
 import React from "react";
 
 function WriteFunction() {
-  const [isClicked, setClicked] = React.useState<"single" | "multi">();
+  const [isClicked, setClicked] = React.useState<"single" | "multi" | "">("");
   return (
     <>
       <div className="flex flex-col gap-2 mt-2">

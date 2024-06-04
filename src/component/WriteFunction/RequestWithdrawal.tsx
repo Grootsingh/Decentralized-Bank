@@ -37,6 +37,10 @@ function RequestWithdrawal() {
     React.useState<DepositEmitType>();
   const globalWriteRequestState = useRecoilValue(GlobalWriteRequestState);
   const unwatchRef = React.useRef<() => void>();
+  const [emitState, setEmitState] = React.useState<
+    "idle" | "loading" | "success"
+  >("idle");
+  const [isClicked, setClicked] = React.useState<"requestWithdrawal" | "">("");
   function handleRequestWithdrawal() {
     if (!accountID) {
       return setError("accountID required");
@@ -51,7 +55,7 @@ function RequestWithdrawal() {
       return setError("requestedAmount required to be Number");
     }
     const accountIDNumber = Number(accountID);
-
+    setClicked("requestWithdrawal");
     writeToContractFn(
       "requestWithdrawal",
       0,
@@ -62,7 +66,12 @@ function RequestWithdrawal() {
   }
 
   React.useEffect(() => {
-    if (globalWriteRequestState === "success") {
+    if (
+      globalWriteRequestState === "success" &&
+      isClicked === "requestWithdrawal"
+    ) {
+      setEmitState("loading");
+      setClicked("");
       setAccountID("");
       setRequestedAmount("");
 
@@ -105,6 +114,8 @@ function RequestWithdrawal() {
   React.useEffect(() => {
     if (typeof unwatchRef.current === "function") {
       unwatchRef?.current();
+      setEmitState("success");
+      setClicked("");
     }
   }, [requestWithdrawalEmit?.timestamp]);
 
@@ -172,13 +183,20 @@ function RequestWithdrawal() {
             </div>
           </div>
 
-          {requestWithdrawalEmit ? (
+          {emitState === "success" ? (
             <div className="rounded-md flex bg-green-400 px-2 py-1 w-fit mt-1">
               <p className="text-xs font-bold pr-1 text-nowrap text-gray-950">
                 Emit -
               </p>
               <p className="text-xs font-bold text-gray-950">
                 {JSON.stringify(requestWithdrawalEmit, null, 2)}
+              </p>
+            </div>
+          ) : undefined}
+          {emitState === "loading" ? (
+            <div className="rounded-md flex bg-green-400 px-2 py-1 w-fit mt-1">
+              <p className="text-xs font-bold pr-1 text-nowrap text-gray-950">
+                Loading...
               </p>
             </div>
           ) : undefined}

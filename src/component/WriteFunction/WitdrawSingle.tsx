@@ -35,6 +35,10 @@ function WithdrawSingle() {
     React.useState<WithdrawSingleEmit>();
   const globalWriteRequestState = useRecoilValue(GlobalWriteRequestState);
   const unwatchRef = React.useRef<() => void>();
+  const [emitState, setEmitState] = React.useState<
+    "idle" | "loading" | "success"
+  >("idle");
+  const [isClicked, setClicked] = React.useState<"withdrawSingle" | "">("");
   function handleRequestWithdrawal() {
     if (!accountID) {
       return setError("accountID required");
@@ -50,6 +54,7 @@ function WithdrawSingle() {
     }
     const accountIDNumber = Number(accountID);
     const withdrawSingleNum = Number(withdrawAmount);
+    setClicked("withdrawSingle");
     writeToContractFn(
       "withdrawSingle",
       0,
@@ -60,7 +65,12 @@ function WithdrawSingle() {
   }
 
   React.useEffect(() => {
-    if (globalWriteRequestState === "success") {
+    if (
+      globalWriteRequestState === "success" &&
+      isClicked === "withdrawSingle"
+    ) {
+      setEmitState("loading");
+      setClicked("");
       setAccountID("");
       setWithdrawAmount("");
 
@@ -101,6 +111,8 @@ function WithdrawSingle() {
   React.useEffect(() => {
     if (typeof unwatchRef.current === "function") {
       unwatchRef?.current();
+      setEmitState("success");
+      setClicked("");
     }
   }, [WithdrawalSingleEmit?.timestamp]);
 
@@ -168,13 +180,20 @@ function WithdrawSingle() {
             </div>
           </div>
 
-          {WithdrawalSingleEmit ? (
+          {emitState === "success" ? (
             <div className="rounded-md flex bg-green-400 px-2 py-1 w-fit mt-1">
               <p className="text-xs font-bold pr-1 text-nowrap text-gray-950">
                 Emit -
               </p>
               <p className="text-xs font-bold text-gray-950">
                 {JSON.stringify(WithdrawalSingleEmit, null, 2)}
+              </p>
+            </div>
+          ) : undefined}
+          {emitState === "loading" ? (
+            <div className="rounded-md flex bg-green-400 px-2 py-1 w-fit mt-1">
+              <p className="text-xs font-bold pr-1 text-nowrap text-gray-950">
+                Loading...
               </p>
             </div>
           ) : undefined}

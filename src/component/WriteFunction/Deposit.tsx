@@ -28,10 +28,8 @@ interface CustomLogType {
 
 function Deposit(props: {
   user: "single" | "multi";
-  isClicked: "single" | "multi" | undefined;
-  setClicked: React.Dispatch<
-    React.SetStateAction<"single" | "multi" | undefined>
-  >;
+  isClicked: "single" | "multi" | "";
+  setClicked: React.Dispatch<React.SetStateAction<"single" | "multi" | "">>;
 }) {
   const [accountID, setAccountID] = React.useState("");
   const [amount, setAmount] = React.useState("");
@@ -42,6 +40,10 @@ function Deposit(props: {
   const globalWriteRequestState = useRecoilValue(GlobalWriteRequestState);
   const instanceID = React.useId();
   const unwatchRef = React.useRef<() => void>();
+  const [emitState, setEmitState] = React.useState<
+    "idle" | "loading" | "success"
+  >("idle");
+
   function handleDeposit() {
     if (!accountID) {
       return setError("accountID required");
@@ -57,7 +59,6 @@ function Deposit(props: {
     }
     const accountIDNumber = Number(accountID);
     const amountNumber = Number(amount);
-
     setClicked(user);
     setError("");
 
@@ -65,8 +66,10 @@ function Deposit(props: {
   }
   React.useEffect(() => {
     if (globalWriteRequestState === "success" && user === isClicked) {
+      setEmitState("loading");
       setAccountID("");
       setAmount("");
+
       const unwatch = watchContractEvent(config, {
         address: contractAddress,
         abi,
@@ -97,7 +100,7 @@ function Deposit(props: {
       unwatchRef.current = unwatch;
       () => {
         unwatch();
-        setClicked(undefined);
+        setClicked("");
       };
     }
   }, [globalWriteRequestState]);
@@ -105,6 +108,8 @@ function Deposit(props: {
   React.useEffect(() => {
     if (typeof unwatchRef.current === "function") {
       unwatchRef?.current();
+      setEmitState("success");
+      setClicked("");
     }
   }, [DepositEmit?.timestamp]);
 
@@ -172,13 +177,20 @@ function Deposit(props: {
             </div>
           </div>
 
-          {DepositEmit ? (
+          {emitState === "success" ? (
             <div className="rounded-md flex bg-green-400 px-2 py-1 w-fit mt-1">
               <p className="text-xs font-bold pr-1 text-nowrap text-gray-950">
                 Emit -
               </p>
               <p className="text-xs font-bold text-gray-950">
                 {JSON.stringify(DepositEmit, null, 2)}
+              </p>
+            </div>
+          ) : undefined}
+          {emitState === "loading" ? (
+            <div className="rounded-md flex bg-green-400 px-2 py-1 w-fit mt-1">
+              <p className="text-xs font-bold pr-1 text-nowrap text-gray-950">
+                Loading...
               </p>
             </div>
           ) : undefined}

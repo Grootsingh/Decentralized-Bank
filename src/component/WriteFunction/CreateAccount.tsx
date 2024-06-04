@@ -27,8 +27,18 @@ function CreateAccount() {
   const [acountCreatedSingleEmit, setAccountCreaterSingleEmit] =
     React.useState<createAccountEmitType>();
   const unwatchRef = React.useRef<() => void>();
+  const [emitState, setEmitState] = React.useState<
+    "idle" | "loading" | "success"
+  >("idle");
+  const [isClicked, setClicked] = React.useState<"createAccount" | "">("");
   React.useEffect(() => {
-    if (globalWriteRequestState === "success") {
+    if (
+      globalWriteRequestState === "success" &&
+      isClicked === "createAccount"
+    ) {
+      setEmitState("loading");
+      setClicked("");
+
       const unwatch = watchContractEvent(config, {
         address: contractAddress,
         abi,
@@ -67,6 +77,8 @@ function CreateAccount() {
   React.useEffect(() => {
     if (typeof unwatchRef.current === "function") {
       unwatchRef?.current();
+      setEmitState("success");
+      setClicked("");
     }
   }, [acountCreatedSingleEmit?.timestamp]);
 
@@ -77,17 +89,25 @@ function CreateAccount() {
         className="rounded-md bg-blue-500 font-semibold shrink-0 text-white mr-2 w-fit px-2 py-1"
         onClick={() => {
           writeToContractFn("createAccount");
+          setClicked("createAccount");
         }}
       >
         Create Account
       </button>
-      {acountCreatedSingleEmit ? (
+      {emitState === "success" ? (
         <div className="rounded-md flex bg-green-400 px-2 py-1 w-fit">
           <p className="text-xs text-nowrap pr-1 font-bold text-gray-950">
             Emit -
           </p>
           <p className="text-xs font-bold text-gray-950">
             {JSON.stringify(acountCreatedSingleEmit, null, 2)}
+          </p>
+        </div>
+      ) : undefined}
+      {emitState === "loading" ? (
+        <div className="rounded-md flex bg-green-400 px-2 py-1 w-fit mt-1">
+          <p className="text-xs font-bold pr-1 text-nowrap text-gray-950">
+            Loading...
           </p>
         </div>
       ) : undefined}

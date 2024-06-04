@@ -16,9 +16,11 @@ function WriteRequestInfo() {
     <>
       <p className="font-medium"> Status - {globalWriteRequestState}</p>
       {globalWriteRequestErrorCause ? (
-        <p className="font-medium">
-          Error Message - {globalWriteRequestErrorCause}
-        </p>
+        <div className="rounded-md flex bg-red-400 px-2 py-1 w-fit mt-1">
+          <p className="font-bold text-sm">
+            Error Message - {globalWriteRequestErrorCause}
+          </p>
+        </div>
       ) : undefined}
     </>
   );

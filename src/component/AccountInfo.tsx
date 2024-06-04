@@ -37,7 +37,9 @@ function AccountInfo() {
         </p>
 
         {connectState !== "none" ? (
-          <p className="font-medium">Error Message - {connectState}</p>
+          <div className="rounded-md flex bg-red-400 px-2 py-1 w-fit mt-1">
+            <p className="font-bold text-sm">Error Message - {connectState}</p>
+          </div>
         ) : undefined}
       </div>
       <div className="mt-2 rounded-md px-2 py-1 bg-lime-200 border-lime-300 border-2">

@@ -28,6 +28,10 @@ function JointAccount() {
     React.useState<JointAccountEmitType>();
   const globalWriteRequestState = useRecoilValue(GlobalWriteRequestState);
   const unwatchRef = React.useRef<() => void>();
+  const [emitState, setEmitState] = React.useState<
+    "idle" | "loading" | "success"
+  >("idle");
+  const [isClicked, setClicked] = React.useState<"jointAccount" | "">("");
 
   function handleJointAccount() {
     if (!inputValue) {
@@ -41,6 +45,7 @@ function JointAccount() {
       );
       if (hasValidAddress) {
         writeToContractFn("createAccount", 0, jointAccountArray);
+        setClicked("jointAccount");
         setError("");
       } else {
         setError("incorrect userAddress");
@@ -49,7 +54,9 @@ function JointAccount() {
   }
 
   React.useEffect(() => {
-    if (globalWriteRequestState === "success") {
+    if (globalWriteRequestState === "success" && isClicked === "jointAccount") {
+      setEmitState("loading");
+      setClicked("");
       setInputValue("");
       const unwatch = watchContractEvent(config, {
         address: contractAddress,
@@ -87,6 +94,8 @@ function JointAccount() {
   React.useEffect(() => {
     if (typeof unwatchRef.current === "function") {
       unwatchRef?.current();
+      setEmitState("success");
+      setClicked("");
     }
   }, [acountCreatedMultipleEmit?.timestamp]);
 
@@ -119,13 +128,20 @@ function JointAccount() {
               Error - {error}
             </p>
           ) : undefined}
-          {acountCreatedMultipleEmit ? (
+          {emitState === "success" ? (
             <div className="rounded-md flex bg-green-400 px-2 py-1 w-fit mt-1">
               <p className="text-xs font-bold pr-1 text-nowrap text-gray-950">
                 Emit -
               </p>
               <p className="text-xs font-bold text-gray-950">
                 {JSON.stringify(acountCreatedMultipleEmit, null, 2)}
+              </p>
+            </div>
+          ) : undefined}
+          {emitState === "loading" ? (
+            <div className="rounded-md flex bg-green-400 px-2 py-1 w-fit mt-1">
+              <p className="text-xs font-bold pr-1 text-nowrap text-gray-950">
+                Loading...
               </p>
             </div>
           ) : undefined}
